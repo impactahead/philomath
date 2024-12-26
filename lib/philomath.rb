@@ -10,7 +10,7 @@ require_relative 'philomath/rendering/render_callback'
 
 module Philomath
   class << self
-    def render(chapters:)
+    def render(chapters:, output_path: nil)
       table_of_contents = {}
       contents = {}
       pdf_chapters = []
@@ -21,9 +21,10 @@ module Philomath
       pdf.font('Inter')
 
       chapters.each do |chapter|
+        content = chapter.key?(:content) ? chapter[:content] : File.read(chapter.fetch(:file_path))
         pdf_chapters << {
           name: chapter[:name],
-          parsed_elements: Markdownlyze.parse(chapter[:content])
+          parsed_elements: Markdownlyze.parse(content)
         }
       end
 
@@ -42,30 +43,30 @@ module Philomath
         chapter_elements.each do |node|
           case node[:element]
           when :h1
-            pdf.public_send("h1", node[:value], callback: callback)
+            pdf.h1(node[:value], callback: callback)
           when :h2
             table_of_contents[chapter_conf[:name]][:headings][node[:value]] = pdf.page_number
-            pdf.public_send("h2", node[:value], callback: callback)
+            pdf.h2(node[:value], callback: callback)
           when :h3
-            pdf.public_send("h3", node[:value], callback: callback)
+            pdf.h3(node[:value], callback: callback)
           when :h4
-            pdf.public_send("h4", node[:value], callback: callback)
+            pdf.h4(node[:value], callback: callback)
           when :paragraph
-            pdf.public_send("paragraph", callback.call(node[:value]))
+            pdf.paragraph(callback.call(node[:value]))
           when :code_block
-            pdf.public_send("code_block", node[:value], node[:language])
+            pdf.code_block(node[:value], node[:language])
           when :blank_line
             pdf.move_down(3)
           when :ol
-            pdf.public_send("ol", node[:value], callback: callback)
+            pdf.ol(node[:value], callback: callback)
           when :ul
-            pdf.public_send("ul", node[:value], callback: callback)
+            pdf.ul(node[:value], callback: callback)
           when :image
             pdf.move_down(6)
             pdf.image(chapter.images[node[:value]], position: :center, width: pdf.bounds.width - 25)
             pdf.move_down(6)
           when :quote
-            pdf.public_send("quote", node[:value], callback: callback)
+            pdf.quote(node[:value], callback: callback)
             pdf.move_down(6)
           end
         end
@@ -77,10 +78,10 @@ module Philomath
 
       pdf.go_to_page(toc_page)
 
-      pdf.public_send("h1", 'Table of contents')
+      pdf.h1('Table of contents')
       pdf.move_down(50)
 
-      pdf.public_send("table_of_contents", table_of_contents)
+      pdf.table_of_contents(table_of_contents)
 
       # Generate clickable table of contents
       pdf.outline.define do |outline|
@@ -107,7 +108,11 @@ module Philomath
 
       pdf.number_pages('<page>', options)
 
-      pdf.render
+      if output_path
+        pdf.render_file(output_path)
+      else
+        pdf.render
+      end
     end
 
     private

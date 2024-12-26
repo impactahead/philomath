@@ -3,7 +3,7 @@ module Philomath
     module_function
 
     def to_s
-      "0.0.1"
+      "0.0.2"
     end
   end
 end
