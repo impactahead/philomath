@@ -9,3 +9,5 @@ Variables in Ruby don't need explicit declaration - they're created when you fir
 ```ruby
 some_variable = 'test'
 ```
+
+![Some image](./images/1.png)

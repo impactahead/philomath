@@ -2,6 +2,7 @@ require 'markdownlyze'
 require 'prawn'
 require 'prawn_components'
 require 'nokogiri'
+require 'open-uri'
 
 require_relative 'philomath/rendering/render_code_inline'
 require_relative 'philomath/rendering/render_styled_link'
@@ -24,6 +25,7 @@ module Philomath
         content = chapter.key?(:content) ? chapter[:content] : File.read(chapter.fetch(:file_path))
         pdf_chapters << {
           name: chapter[:name],
+          path_to_chapter: File.dirname(chapter[:file_path]),
           parsed_elements: Markdownlyze.parse(content)
         }
       end
@@ -61,9 +63,18 @@ module Philomath
             pdf.ol(node[:value], callback: callback)
           when :ul
             pdf.ul(node[:value], callback: callback)
+          when :remote_image
+            pdf.move_down(6)
+            pdf.image(URI.open(node[:value]), position: :center, width: pdf.bounds.width - 25)
+            pdf.move_down(6)
           when :image
             pdf.move_down(6)
-            pdf.image(chapter.images[node[:value]], position: :center, width: pdf.bounds.width - 25)
+
+            chapter_path = chapter_conf[:path_to_chapter]
+            path_to_image = node[:value]
+            image_absolute_path = File.join(chapter_path, path_to_image.sub(/^\.\//, ''))
+            pdf.image(image_absolute_path, position: :center, width: pdf.bounds.width - 25)
+
             pdf.move_down(6)
           when :quote
             pdf.quote(node[:value], callback: callback)
