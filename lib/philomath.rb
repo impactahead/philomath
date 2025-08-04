@@ -11,7 +11,7 @@ require_relative 'philomath/rendering/render_callback'
 
 module Philomath
   class << self
-    def render(chapters:, output_path: nil)
+    def render(chapters:, output_path: nil, cover_image: nil)
       table_of_contents = {}
       contents = {}
       pdf_chapters = []
@@ -20,6 +20,14 @@ module Philomath
 
       PrawnComponents.initialize_fonts(pdf: pdf)
       pdf.font('Inter')
+
+      unless cover_image.nil?
+        pdf.canvas do
+          pdf.image(cover_image, scale: 0.4, at: pdf.bounds.top_left)
+        end
+
+        pdf.start_new_page
+      end
 
       chapters.each do |chapter|
         content = chapter.key?(:content) ? chapter[:content] : File.read(chapter.fetch(:file_path))
@@ -85,7 +93,7 @@ module Philomath
         pdf.start_new_page unless chapter_conf_i == pdf_chapters.size - 1
       end
 
-      toc_page = 1
+      toc_page = cover_image.nil? ? 1 : 2
 
       pdf.go_to_page(toc_page)
 
