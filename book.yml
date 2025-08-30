@@ -1,0 +1,7 @@
+name: 'Sample book'
+author: Paweł Dąbrowski
+chapters:
+  - :name: Introduction
+    :file_path: sample_book/introduction.md
+  - :name: Basics
+    :file_path: sample_book/basics.md

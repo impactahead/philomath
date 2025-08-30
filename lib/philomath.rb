@@ -3,6 +3,7 @@ require 'prawn'
 require 'prawn_components'
 require 'nokogiri'
 require 'open-uri'
+require 'yaml'
 
 require_relative 'philomath/rendering/render_code_inline'
 require_relative 'philomath/rendering/render_styled_link'
@@ -11,6 +12,12 @@ require_relative 'philomath/rendering/render_callback'
 
 module Philomath
   class << self
+    def render_from_config(config_file: 'book.yml', output_path: nil)
+      configuration = YAML.load(File.read(config_file))
+
+      render(chapters: configuration.fetch('chapters'), output_path:, cover_image: configuration['cover_image'])
+    end
+
     def render(chapters:, output_path: nil, cover_image: nil)
       table_of_contents = {}
       contents = {}
