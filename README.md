@@ -7,6 +7,10 @@ From markdown files to PDF book:
 * Code blocks with syntax highlighting
 * Support for the following elements: `h1`, `h2`, `h3`, `h4`, `ul`, `ol`, `quote`, and `code_block`.
 
+## Quick start
+
+You can just fork the [starter template](https://github.com/philomath-books/philomath-starter-template) and write your own book.
+
 ## Installation
 
 Install library:
