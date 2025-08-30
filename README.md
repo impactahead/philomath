@@ -9,7 +9,7 @@ From markdown files to PDF book:
 
 ## Quick start
 
-You can just fork the [starter template](https://github.com/philomath-books/philomath-starter-template) and write your own book.
+You can just fork the [starter template](https://github.com/impactahead/philomath-starter-template) and write your own book.
 
 ## Installation
 
